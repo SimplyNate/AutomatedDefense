@@ -1,3 +1,3 @@
 # AutomatedDefense  
 
-## Requires Python 3.7
+## Requires Python >=3.6 maybe
