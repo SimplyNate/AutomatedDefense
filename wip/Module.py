@@ -2,6 +2,7 @@ class Modules:
     modules = []  # list of module strings
     mods = []  # list of module objects
     active_list = []  # list of modules currently matching the user's choice
+    params = []
 
     def __init__(self, filename):
         self.modules = load_modules(filename)  # Load the specified config file
@@ -13,33 +14,61 @@ class Modules:
                 m = Module(module)  # Create a new class for that module
                 self.mods.append(m)  # Append the module to a list
 
-    def build_initial_list(self):
-        ops = []
-        for mod in self.mods:
-            self.active_list.append(mod)
-            op1 = mod.get_op_num(1)
-            if op1 not in ops:
-                ops.append(op1.replace("Option1", "").strip())
-        return ops
-
-    def build_subsequent_list(self, answer, level):
+    def build_active_list(self, level, answer=None):
         """
         Builds subsequent list of options for user to choose from
         :param answer: last answer given
         :param level: current iteration
         :return: list of options for user to choose from
         """
-        for mod in self.active_list:
+        if answer is None:  # If no answer is provided, this is the first run
+            ops = []
+            for mod in self.mods:
+                self.active_list.append(mod)
+                op1 = mod.get_op_num(level)
+                if op1 not in ops:
+                    ops.append(op1.replace(f"Option{level}", "").strip())
+            return ops
+        else:
+            ops = []
+            if len(self.active_list) > 1:  # If we are still narrowing down modules
+                for mod in self.active_list:
+                    # Go through elimination round first, then parse through the remainder!!!
+                    # Else, return the list of options at the current level
+                    prev_option = clean_line(mod.get_op_num(level-1), "Option", level-1)
+                    if prev_option == answer:
+                        ops.append(clean_line(mod.get_op_num(level), "Option", level))
+                    else:
+                        self.eliminate_mod(mod)
+                # At this point all the unmatching modules should be eliminated
+                return ops
+            else:  # Else, we have narrowed down to one module to use
+                mod = self.active_list[0]  # Get the remaining module
+                if level > len(mod.options):  # If the level is greater than the number of options
+                    if level > len(mod.options) + len(mod.parameters):  # If level > number of options + params
+                        # Run the execute command(s)
+                        execs = mod.get_exec()
+                        return execs
+                    else:  # Return a single parameter
+                        param_num = level - len(mod.options)
+                        param = clean_line(mod.get_param_num(param_num), "Parameter", param_num)
+                        return param
+                else:
+                    ops.append(clean_line(mod.get_op_num(level), "Option", level))
+                    return ops
 
     def eliminate_mod(self, mod):
         self.active_list.remove(mod)
 
+    def add_mod_param(self, param):
+        self.active_list[0].set_param(param)
 
 
 class Module:
     options = []
     parameters = []
     execute = []
+    set_parameters = []
 
     def __init__(self, module):
         self.options = parse_module(module, "Option")
@@ -56,9 +85,14 @@ class Module:
             if int(param.split()[9]) == number:
                 return param
 
+    def get_params(self):
+        return self.parameters
+
     def get_exec(self):
         return self.execute
 
+    def set_param(self, param):
+        self.set_parameters.append(param)
 
 
 def parse_module(module, keyword):
@@ -102,3 +136,6 @@ def load_modules(filename):
     else:
         return f"Error occurred while parsing {filename}: No configurations found in file."
 
+
+def clean_line(line, category, num):
+    return line.replace(f"{category}{num}").strip()
