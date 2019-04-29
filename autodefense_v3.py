@@ -100,7 +100,7 @@ def mainloop(config, crit, mods):
         if len(active_list) > 1 or len(active_list[0].options) > len(crit):
             ops = []  # Initialize list to store options
             for mod in active_list:
-                op = clean_line(mod.get_op_num(len(crit+1)), "Option", len(crit)+1)
+                op = clean_line(mod.get_op_num(len(crit)+1), "Option", len(crit)+1)
                 if op not in ops:
                     ops.append(op)
             show_selection(ops)
@@ -118,7 +118,7 @@ def mainloop(config, crit, mods):
             mod = active_list[0]  # There should be only one module in the active list, so bind it to a variable
             params = mod.get_params()
             set_params = []
-            for i in range(params):
+            for i in range(len(params)):
                 param = clean_line(params[i], "Parameter", i+1)
                 param_answer = input(f"{param}: ")
                 if param_answer is "b" or param_answer is "back":
@@ -134,7 +134,7 @@ def mainloop(config, crit, mods):
                 # All parameters are set: Execute
                 exe = mod.get_exec()
                 for ex in exe:
-                    execute(ex, params)
+                    execute(ex, set_params)
                     raise SystemExit
 
     return config, crit, mods

@@ -23,11 +23,12 @@ class Modules:
         if len(criteria) > 0:
             for mod in self.mods:
                 crit_matching = 0
-                for i in range(len(criteria)):
-                    if criteria[i] == clean_line(mod.get_op_num(i+1), "Option", i+1):
-                        crit_matching += 1
-                if crit_matching == len(criteria):
-                    active_list.append(mod)
+                if len(criteria) <= len(mod.options):
+                    for i in range(len(criteria)):
+                        if criteria[i] == clean_line(mod.get_op_num(i+1), "Option", i+1):
+                            crit_matching += 1
+                    if crit_matching == len(criteria):
+                        active_list.append(mod)
             if len(active_list) > 0:
                 return active_list
             else:
