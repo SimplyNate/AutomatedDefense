@@ -57,12 +57,22 @@ def homepage():
 
 
 def show_selection(ops):
+    """
+    Function to print all options to screen
+    :param ops: List of options to print
+    :return: null
+    """
     for i in range(len(ops)):
         print(f"{i+1}. {ops[i]}")
     print()
 
 
 def make_selection(ops):
+    """
+    Function to prompt for user selection during Option selection
+    :param ops: List of options to select from
+    :return: String of user's selection
+    """
     while True:  # Input validation
         selection = input("Select a number from above, b to go back, or q to quit: ").strip()
         if selection is "q" or selection is "quit" or selection is "exit":
@@ -82,6 +92,13 @@ def make_selection(ops):
 
 # Determines what to do
 def mainloop(config, crit, mods):
+    """
+    Function to perform the main loop of the prograsm
+    :param config: String Name of file to load
+    :param crit: List of criteria to search modules for
+    :param mods: Modules object (so it doesn't get reinitialized every round)
+    :return: config, crit, mods that are set during runtime
+    """
     if config is "":
         ops = homepage()
         show_selection(ops)
@@ -142,9 +159,11 @@ def mainloop(config, crit, mods):
 
 # Entry Point into Program
 if __name__ == '__main__':
+    # Initialize variables
     file = ""
     criteria = []
-    done = False
     modules = None
-    while not done:
+    # Mainloop
+    while True:
+        # Refresh variables and rerun mainloop
         file, criteria, modules = mainloop(file, criteria, modules)

@@ -1,7 +1,6 @@
 class Modules:
     modules = []  # list of module strings
     mods = []  # list of module objects
-    active_list = []  # list of modules currently matching the user's choice
 
     def __init__(self, filename):
         self.modules = load_modules(filename)  # Load the specified config file
@@ -17,7 +16,7 @@ class Modules:
         """
         Builds active list of mods based on search criteria
         :param criteria: list of criteria to build the active list from
-        :return: list of options for user to choose from
+        :return: list of mods that match the criteria
         """
         active_list = []
         if len(criteria) > 0:
@@ -36,9 +35,6 @@ class Modules:
                 raise SystemExit
         else:
             return self.mods
-
-    def add_mod_param(self, param):
-        self.active_list[0].set_param(param)
 
 
 class Module:
