@@ -24,7 +24,6 @@ SOFTWARE.
 from Module import *
 from Functions import *
 import re
-import copy
 
 
 def homepage():
@@ -79,14 +78,6 @@ def make_selection(ops):
                     print()
                 else:  # Else, exit the loop
                     return selection
-
-
-def add_history(o, m, i, s):
-    _o = copy.deepcopy(o)
-    _m = copy.deepcopy(m)
-    _i = copy.deepcopy(i)
-    _s = copy.deepcopy(s)
-    history.append([_o, _m, _i, _s])
 
 
 # Determines what to do
@@ -157,62 +148,3 @@ if __name__ == '__main__':
     modules = None
     while not done:
         file, criteria, modules = mainloop(file, criteria, modules)
-
-    """
-    history = []  # Keeps track of all user input for replay
-    done = False
-    iteration = 0
-    section = "homepage"
-    ops, modules, selection = None, None, None
-    history.append([ops, modules, iteration, selection])
-    while not done:
-        if section is "homepage":
-            ops = homepage()  # Get list of homepage options
-            section = "module"  # Change the section for next run
-            show_selection(ops)
-            selected = make_selection(ops)  # Get user input
-            selection = ops[selected - 1]  # Get corresponding option from selection
-            iteration += 1  # Add 1 to the iteration number
-            add_history(ops, modules, iteration, selection)  # Append the user interactions with the iteration
-        elif section is "module":
-            if modules is None:  # If no modules are defined (selection)
-                modules = Modules(selection)  # Create a new modules object
-                selection = None  # Reset the selection variable
-            active_list = modules.build_active_list(iteration, selection)  # Build the active list
-            show_selection(active_list)
-            selected = make_selection(active_list)
-            if selected is "b" or selected is "back":
-                del history[-1]
-                ops = history[-1][0]
-                # modules = history[-1][1]
-                # iteration = history[-1][2]
-                selection = history[-1][3]
-                iteration -= 1
-                modules.go_back()
-            else:
-                selection = active_list[selected - 1]
-                iteration += 1
-                add_history(ops, modules, iteration, selection)
-            # Check if the active_list only has 1 object left
-            # if len(modules.active_list) == 1:
-            if iteration > len((modules.active_list[0]).options):
-                section = "parameter"
-        elif section is "parameter":
-            param = modules.build_active_list(iteration, selection)
-            answer = input(f"{param}: ")
-            # Bind the selection to the module
-            modules.add_mod_param(answer)
-            iteration += 1
-            add_history(ops, modules, iteration, selection)
-            if iteration > (len((modules.active_list[0]).parameters) + len((modules.active_list[0]).options)):
-                section = "execute"
-        elif section is "execute":
-            exe = modules.build_active_list(iteration, selection)
-            params = modules.active_list[0].set_parameters
-            for ex in exe:
-                execute(ex, params)
-            done = True
-        else:
-            print("Error: part is invalid")
-            raise SystemExit
-    """
