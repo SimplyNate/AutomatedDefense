@@ -101,6 +101,7 @@ def is_ip(hosts):
 
 
 def execute(command, parameters):
+    command = command.replace("Execute", "").strip()
     for i in range(len(parameters)):
         command = command.replace("[Parameter" + str(i+1) + "]", parameters[i])
         if "[Parameter" + str(i+1) + "_file]" in command:
