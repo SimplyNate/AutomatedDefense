@@ -31,28 +31,31 @@ def homepage():
     Loads the homepage of the application based on the Startup.cfg contents
     :return: list of config files to parse
     """
-    homepg = open("modules/Startup.cfg").readlines()
-    splash_screen = """"""
-    options = []
-    sc_section = False
-    op_section = False
-    for line in homepg:
-        if sc_section:
-            if "[Options]" in line:
-                sc_section = False
-            else:
-                splash_screen += line
-        if op_section:
-            if "[Splash Screen]" in line or line == "\n":
-                op_section = False
-            else:
-                options.append(line.strip())
-        if "[Splash Screen]" in line:
-            sc_section = True
-        if "[Options]" in line:
-            op_section = True
-
-    coolprint(splash_screen)
+    homepg = open("modules/Startup.cfg").readlines()  # Read the lines of the Startup config
+    splash_screen = ""  # Initialize string to hold splash screen
+    options = []  # Initialize variable to store options
+    sc_section = False  # Keep track of section
+    op_section = False  # Keep track of section
+    for line in homepg:  # For each line in the Startup.cfg file:
+        if "[Splash Screen]" in line:  # If the splash screen header is read
+            sc_section = True  # Start section for splash screen
+            op_section = False
+            continue  # Skip remainder of for loop iteration
+        elif "[Options]" in line:  # If the options header is read
+            op_section = True  # Start section for options
+            sc_section = False
+            continue  # Skip remainder of for loop iteration
+        if sc_section:  # If the splash screen is being read:
+            if "[Options]" in line:  # If the Options header is reached:
+                sc_section = False  # Discontinue section for splash screen
+            else:  # Else:
+                splash_screen += line  # Add the line to the splash screen string
+        elif op_section:  # If the options section is being read:
+            if "[Splash Screen]" in line or line == "\n":  # If splash screen is read or a newline is read:
+                op_section = False  # Discontinue section for option
+            else:  # Else:
+                options.append(line.strip())  # Add the line to the options list
+    coolprint(splash_screen)  # Print splash screen
     return options
 
 
@@ -74,19 +77,19 @@ def make_selection(ops):
     :return: String of user's selection
     """
     while True:  # Input validation
-        selection = input("Select a number from above, b to go back, or q to quit: ").strip()
-        if selection is "q" or selection is "quit" or selection is "exit":
-            raise SystemExit
-        elif selection is "b" or selection is "back":
-            return selection
-        else:
-            match = re.compile("[0-9]+")
-            if re.match(match, selection):
-                selection = int(selection)
-                if selection > len(ops) or selection < 1:
-                    print(f"Please select an option within the range: [1-{len(ops)}]")
-                    print()
-                else:  # Else, exit the loop
+        selection = input("Select a number from above, b to go back, or q to quit: ").strip()  # Get User Input
+        if selection is "q" or selection is "quit" or selection is "exit":  # If the user wants to exit:
+            raise SystemExit  # Exit application
+        elif selection is "b" or selection is "back":  # If the user wants to go back:
+            return selection  # Return the selection as-is
+        else:  # Else, the user wants to continue
+            match = re.compile("[0-9]+")  # Compile RE for any valid integer
+            if re.match(match, selection):  # If the user input matches the RE
+                selection = int(selection)  # Cast the input as an int
+                if selection > len(ops) or selection < 1:  # If the int is not within the valid range:
+                    print(f"Please select an option within the range: [1-{len(ops)}]")  # Print Error
+                    print()  # Spacer
+                else:  # Else, exit the loop and return the user's input
                     return selection
 
 
@@ -99,61 +102,60 @@ def mainloop(config, crit, mods):
     :param mods: Modules object (so it doesn't get reinitialized every round)
     :return: config, crit, mods that are set during runtime
     """
-    if config is "":
-        ops = homepage()
-        show_selection(ops)
-        selected = make_selection(ops)
-        if selected is "b" or selected is "back":
+    if config is "":  # If the config is blank
+        ops = homepage()  # Get the ops from the Startup.cfg
+        show_selection(ops)  # Display the list of options to the user
+        selected = make_selection(ops)  # Ask for user input and perform input validation
+        if selected is "b" or selected is "back":  # If the user wants to go back:
             pass  # Restart the process without doing anything
-        else:
-            config = ops[selected - 1]
-    # Else if no mods object has been created
-    elif mods is None:
+        else:  # Else, the user wants to proceed
+            config = ops[selected - 1]  # Grab the selected option
+    elif mods is None:  # Else, if no mods object has been created:
         mods = Modules(config)  # Create the object and restart the process
-    else:
-        # Build an active list of mod objects that fit the criteria
-        active_list = mods.build_active_list(crit)
-        # If there's more than one mod or there's more options to go through for a mod:
-        if len(active_list) > 1 or len(active_list[0].options) > len(crit):
+    else:  # Else, a config file has been selected and modules have been created:
+        active_list = mods.build_active_list(crit)  # Build an active list of mod objects that fit the criteria
+        if len(active_list) > 1 or len(active_list[0].options) > len(crit):  # If there's more than one mod or there's more options to go through for a mod:
             ops = []  # Initialize list to store options
-            for mod in active_list:
-                op = clean_line(mod.get_op_num(len(crit)+1), "Option", len(crit)+1)
-                if op not in ops:
-                    ops.append(op)
-            show_selection(ops)
-            selected = make_selection(ops)
-            # If the user wants to go back
-            if selected is "b" or selected is "back":
-                # Delete the last choice made
-                if len(crit) > 0:
-                    del crit[-1]
-                else:
-                    config = ""
-            else:
-                crit.append(ops[selected - 1])
+            for mod in active_list:  # For each mod object in the active_list:
+                op = clean_line(mod.get_op_num(len(crit)+1), "Option", len(crit)+1)  # Get the option number corresponding to the amount of criteria given
+                if op not in ops:  # If the option is not in the list of options
+                    ops.append(op)  # Append the option
+            show_selection(ops)  # Display the list of options to the user
+            selected = make_selection(ops)  # Ask for user input and perform input validation
+            if selected is "b" or selected is "back":  # If the user wants to go back
+                if len(crit) > 0:  # If criteria had been given previously:
+                    del crit[-1]  # Delete the last choice made
+                else:  # Else, there's no choices to delete
+                    config = ""  # Reset the config file to read from
+            else:  # Else, the user wants to proceed:
+                crit.append(ops[selected - 1])  # Append the user's selected option to the list of criteria
         else:  # Else, we are looking to provide the user with parameters or Execute
             mod = active_list[0]  # There should be only one module in the active list, so bind it to a variable
-            params = mod.get_params()
-            set_params = []
-            for i in range(len(params)):
-                param = clean_line(params[i], "Parameter", i+1)
-                param_answer = input(f"{param}: ")
-                if param_answer is "b" or param_answer is "back":
-                    if i > 0:
-                        i -= 1
-                        del set_params[-1]
-                    else:
-                        del crit[-1]
-                else:
-                    set_params.append(param_answer)
-            # Check if all parameters are set
-            if len(set_params) == len(params):
-                # All parameters are set: Execute
-                exe = mod.get_exec()
-                for ex in exe:
-                    execute(ex, set_params)
-                    raise SystemExit
-
+            params = mod.get_params()  # Get the parameters from the module
+            set_params = []  # Initialize list for storing user's parameters
+            for i in range(len(params)):  # For each parameter:
+                param = clean_line(params[i], "Parameter", i+1)  # Clean the Param line
+                param_answer = input(f"{param}: ")  # Ask the user for input
+                if param_answer is "b" or param_answer is "back":  # If the user wants to go back:
+                    if i > 0:  # If 1 or more parameters have been set already:
+                        i -= 2  # Go back two (since when loop repeats it will be +1
+                        del set_params[-1]  # Remove the last set parameter
+                    else:  # Else, no params were set and user wants to see options again:
+                        del crit[-1]  # Remove the last set criteria
+                else:  # Else, the user wants to proceed:
+                    if "subnet" in param.lower() or "ip" in param.lower():  # If the answer is supposed to contain an IP:
+                        if is_ip(param_answer):  # If the input is a valid IP
+                            set_params.append(param_answer)  # Append the input to the list of set_params
+                        else:  # Else, input validation failed:
+                            print(f"Error: {param_answer} is not a valid IP Address or Subnet")  # Print Error
+                            i -= 1  # Restart the current round
+                    else:  # Else, perform no additional input validation:
+                        set_params.append(param_answer)  # Append the input to the list of set_params
+            if len(set_params) == len(params):  # If all params are set:
+                exe = mod.get_exec()  # Get the Execute commands from the mod
+                for ex in exe:  # For each execution command in the list:
+                    execute(ex, set_params)  # Execute the command with the set parameters
+                    raise SystemExit  # Exit the program
     return config, crit, mods
 
 

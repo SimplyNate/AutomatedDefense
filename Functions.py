@@ -112,3 +112,5 @@ def execute(command, parameters):
         subprocess.run(command)
     except FileNotFoundError:
         print("Error: Command not found. Exiting.")
+    except Exception as e:
+        print(e)
