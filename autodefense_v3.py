@@ -133,24 +133,27 @@ def mainloop(config, crit, mods):
             mod = active_list[0]  # There should be only one module in the active list, so bind it to a variable
             params = mod.get_params()  # Get the parameters from the module
             set_params = []  # Initialize list for storing user's parameters
-            for i in range(len(params)):  # For each parameter:
+            i = 0
+            while i < len(params):  # For each parameter:
                 param = clean_line(params[i], "Parameter", i+1)  # Clean the Param line
                 param_answer = input(f"{param}: ")  # Ask the user for input
                 if param_answer is "b" or param_answer is "back":  # If the user wants to go back:
-                    if i > 0:  # If 1 or more parameters have been set already:
-                        i -= 2  # Go back two (since when loop repeats it will be +1
+                    if i > 0 and len(set_params) > 0:  # If 1 or more parameters have been set already:
+                        i -= 1  # Go back one
                         del set_params[-1]  # Remove the last set parameter
                     else:  # Else, no params were set and user wants to see options again:
                         del crit[-1]  # Remove the last set criteria
+                        break
                 else:  # Else, the user wants to proceed:
                     if "subnet" in param.lower() or "ip" in param.lower():  # If the answer is supposed to contain an IP:
                         if is_ip(param_answer):  # If the input is a valid IP
                             set_params.append(param_answer)  # Append the input to the list of set_params
+                            i += 1
                         else:  # Else, input validation failed:
                             print(f"Error: {param_answer} is not a valid IP Address or Subnet")  # Print Error
-                            i -= 1  # Restart the current round
                     else:  # Else, perform no additional input validation:
                         set_params.append(param_answer)  # Append the input to the list of set_params
+                        i += 1
             if len(set_params) == len(params):  # If all params are set:
                 exe = mod.get_exec()  # Get the Execute commands from the mod
                 for ex in exe:  # For each execution command in the list:
