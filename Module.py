@@ -24,7 +24,7 @@ class Modules:
                 crit_matching = 0
                 if len(criteria) <= len(mod.options):
                     for i in range(len(criteria)):
-                        if criteria[i] == clean_line(mod.get_op_num(i+1), "Option", i+1):
+                        if criteria[i] == clean_line(mod.options[i], "Option", i+1):
                             crit_matching += 1
                     if crit_matching == len(criteria):
                         active_list.append(mod)
@@ -41,31 +41,11 @@ class Module:
     options = []
     parameters = []
     execute = []
-    set_parameters = []
 
     def __init__(self, module):
         self.options = parse_module(module, "Option")
         self.parameters = parse_module(module, "Parameter")
         self.execute = parse_module(module, "Execute")
-
-    def get_op_num(self, number):
-        for option in self.options:
-            if int(list(option)[6]) == number:
-                return option
-
-    def get_param_num(self, number):
-        for param in self.parameters:
-            if int(list(param)[9]) == number:
-                return param
-
-    def get_params(self):
-        return self.parameters
-
-    def get_exec(self):
-        return self.execute
-
-    def set_param(self, param):
-        self.set_parameters.append(param)
 
 
 def parse_module(module, keyword):

@@ -117,7 +117,7 @@ def mainloop(config, crit, mods):
         if len(active_list) > 1 or len(active_list[0].options) > len(crit):  # If there's more than one mod or there's more options to go through for a mod:
             ops = []  # Initialize list to store options
             for mod in active_list:  # For each mod object in the active_list:
-                op = clean_line(mod.get_op_num(len(crit)+1), "Option", len(crit)+1)  # Get the option number corresponding to the amount of criteria given
+                op = clean_line(mod.options[len(crit)], "Option", len(crit)+1)  # Get the option number corresponding to the amount of criteria given
                 if op not in ops:  # If the option is not in the list of options
                     ops.append(op)  # Append the option
             show_selection(ops)  # Display the list of options to the user
@@ -131,7 +131,7 @@ def mainloop(config, crit, mods):
                 crit.append(ops[selected - 1])  # Append the user's selected option to the list of criteria
         else:  # Else, we are looking to provide the user with parameters or Execute
             mod = active_list[0]  # There should be only one module in the active list, so bind it to a variable
-            params = mod.get_params()  # Get the parameters from the module
+            params = mod.parameters  # Get the parameters from the module
             set_params = []  # Initialize list for storing user's parameters
             i = 0
             while i < len(params):  # For each parameter:
@@ -155,7 +155,7 @@ def mainloop(config, crit, mods):
                         set_params.append(param_answer)  # Append the input to the list of set_params
                         i += 1
             if len(set_params) == len(params):  # If all params are set:
-                exe = mod.get_exec()  # Get the Execute commands from the mod
+                exe = mod.execute  # Get the Execute commands from the mod
                 for ex in exe:  # For each execution command in the list:
                     execute(ex, set_params)  # Execute the command with the set parameters
                     raise SystemExit  # Exit the program
