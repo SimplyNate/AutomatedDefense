@@ -20,3 +20,5 @@ Note: If you only want to add on to a config, skip to step 3.
 5.  Add Execute to the file, then the line to be executed. If parameters are used, place [Parameter#] in its place.  
 6.  Separate modules in a file by newlines  
 7.  Comments may be added only in their own separate lines  
+  
+Modules are grouped / categorized based on the Option descriptions.
