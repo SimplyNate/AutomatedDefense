@@ -3,6 +3,7 @@ A Python framework script that gives a methodical approach in guiding the user t
 
 ## Requirements  
 Python 3.6 or greater  
+`Modules.py`, `Functions.py`, and `./modules` directory must be in the same directory as `autodefense.py`!
 
 ## Usage  
 `py autodefense.py`  
