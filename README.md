@@ -5,7 +5,7 @@ A Python framework script that gives a methodical approach in guiding the user t
 Python 3.6 or greater  
 
 ## Usage  
-`py autodefense_v3.py`  
+`py autodefense.py`  
 
 The script will look into the `Modules` directory for a `Startup.cfg` file. The script reads for the splash screen and a catalogue of the module configs available to the script, then present these options to the user. When the user chooses a valid option, the script will then look for a .cfg file of the same name in the `Modules` directory.  
 
